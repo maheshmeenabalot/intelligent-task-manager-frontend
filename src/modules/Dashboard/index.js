@@ -42,7 +42,13 @@ const Dashboard = () => {
       setTasks((prevTasks) => prevTasks.map(task => task._id === updatedTask._id ? updatedTask : task));
     });
     socket.on('taskAdded', (newTask) => {
-      setTasks((prevTasks) => [...prevTasks, newTask]);
+      setTasks((prevTasks) => {
+        // Avoid adding the task if it already exists in the list
+        if (!prevTasks.find(task => task._id === newTask._id)) {
+          return [...prevTasks, newTask];
+        }
+        return prevTasks;
+      });
     });
 
     return () => {
@@ -75,12 +81,13 @@ const Dashboard = () => {
         setNewTask({ task: '', description: '', dueDate: '', priority: 'Low', status: 'Pending', collaborators: [] });
         setEditingTask(null);
         setError(null); // Clear any previous errors
-        if (method === 'POST') {
-          socket.emit('taskAdded', resData);
-        } else {
-          socket.emit('taskUpdated', resData);
-        }
         setIsTaskFormVisible(false); // Hide the task form modal after adding/updating
+        // Update tasks state directly
+        if (method === 'POST') {
+          setTasks((prevTasks) => [...prevTasks, resData]);
+        } else {
+          setTasks((prevTasks) => prevTasks.map(task => task._id === resData._id ? resData : task));
+        }
       }
     } catch (error) {
       console.error('Error adding/updating task:', error);
@@ -281,7 +288,6 @@ const Dashboard = () => {
       </div>
     </div>
   );
-  
 };
 
 export default Dashboard;
