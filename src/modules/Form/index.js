@@ -17,8 +17,10 @@ function Form({ isSignInPage = true }) {
     e.preventDefault();
     setMessage(''); // Reset message on form submit
 
+    console.log('Form Data:', data); // Log form data for debugging
+
     try {
-      const res = await fetch(`http://localhost:8000/api/${isSignInPage ? 'login' : 'register'}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/${isSignInPage ? 'login' : 'register'}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -27,6 +29,7 @@ function Form({ isSignInPage = true }) {
       });
 
       const resData = await res.json();
+      console.log('Response Data:', resData); // Log response data for debugging
 
       if (res.status === 400) {
         setMessage(resData.message);
