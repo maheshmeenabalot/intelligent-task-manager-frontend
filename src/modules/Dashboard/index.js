@@ -22,7 +22,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/tasks/${user.id}`, {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/tasks?userId=${user.id}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
