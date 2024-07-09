@@ -9,14 +9,14 @@ import TaskForm from './TaskForm';
 const socket = io('http://localhost:8000'); // Initialize Socket.io connection
 
 const Dashboard = () => {
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user:detail')));
+  const [user] = useState(JSON.parse(localStorage.getItem('user:detail')));
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState({ task: '', description: '', dueDate: '', priority: 'low', status: 'pending', collaborators: [] });
   const [editingTask, setEditingTask] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
-  const [error, setError] = useState(null);
+  const [setError] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null); // For modal
   const [isTaskFormVisible, setIsTaskFormVisible] = useState(false); // For task form modal
 
