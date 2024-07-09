@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import avatar from '../../assets/avatar.svg';
 import { io } from 'socket.io-client';
 import TaskList from './TaskList';
-import SearchAndFilters from './SearchAndFilters';
 import TaskModal from './TaskModal';
 import TaskForm from './TaskForm';
 
@@ -176,77 +175,113 @@ const Dashboard = () => {
   });
 
   return (
-    <div className='flex h-screen overflow-hidden'>
-      {/* Sidebar */}
-      <div className='w-1/4 h-full bg-gray-100 border-r border-gray-200'>
-        <div className='p-8'>
+    <div className='flex flex-col h-screen overflow-hidden'>
+      {/* Header */}
+      <div className=' p-0'>
+      <header className='w-full md:w-auto bg-slate-600 text-white p-4'>
+        <div className='flex items-center justify-between'>
+          <h1 className='text-3xl font-bold'>Intelligent Task Manager</h1>
           <div className='flex items-center space-x-4'>
             <img
               src={avatar}
               alt='User Avatar'
-              className='w-12 h-12 rounded-full border-2 border-blue-300'
+              className='w-12 h-12 rounded-full border-2 border-white'
             />
             <div>
               <h3 className='text-xl font-bold'>{user?.fullName}</h3>
-              <p className='text-gray-500'>My Account</p>
+              <p className='text-gray-300'>My Account</p>
             </div>
           </div>
-          <hr className='my-6 border-t border-gray-200' />
+        </div>
+      </header>
+      </div>
+  
+      {/* Main Content */}
+      <div className='flex-1 overflow-auto p-4 bg-background text-text'>
+        {/* Search and Filters */}
+        <div className='flex flex-wrap items-center space-y-4 md:space-y-0 md:flex-row md:justify-between md:space-x-4 mb-6'>
+          <input
+            type='text'
+            placeholder='Search tasks...'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className='w-full md:w-auto px-4 py-2 border border-navy-blue rounded-l-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-navy-blue text-navy-blue'
+          />
+          <div className='flex items-center space-x-2'>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className='px-4 py-2 border border-navy-blue rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-navy-blue text-navy-blue'
+            >
+              <option value='all'>All Statuses</option>
+              <option value='pending'>Pending</option>
+              <option value='completed'>Completed</option>
+            </select>
+            <select
+              value={filterPriority}
+              onChange={(e) => setFilterPriority(e.target.value)}
+              className='px-4 py-2 border border-navy-blue rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-navy-blue text-navy-blue'
+            >
+              <option value='all'>All Priorities</option>
+              <option value='low'>Low</option>
+              <option value='medium'>Medium</option>
+              <option value='high'>High</option>
+            </select>
+          </div>
+        </div>
+  
+        {/* Task List */}
+        <div className='w-full bg-white border-b border-gray-200 flex items-center justify-between mb-2'>
           <button
             onClick={() => setIsTaskFormVisible(true)}
-            className='w-full bg-blue-500 text-white py-2 rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500'
+            className='bg-secondary text-white py-2 px-4 rounded-md shadow-sm hover:bg-button-hover focus:outline-none focus:ring-2 focus:ring-secondary'
           >
             Add Task
           </button>
         </div>
-      </div>
-
-      {/* Main Content */}
-      <div className='flex-1 overflow-auto'>
-        <div className='p-8'>
-          <SearchAndFilters
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            filterStatus={filterStatus}
-            setFilterStatus={setFilterStatus}
-            filterPriority={filterPriority}
-            setFilterPriority={setFilterPriority}
+  
+        <TaskList
+          tasks={filteredTasks}
+          handleDeleteTask={handleDeleteTask}
+          handleEditTask={handleEditTask}
+          handleAddCollaborator={handleAddCollaborator}
+        />
+  
+        {/* Task Modal */}
+        {selectedTask && (
+          <TaskModal
+            task={selectedTask}
+            onClose={handleCloseModal}
+            onCollaboratorAdded={handleCollaboratorAdded}
           />
-          <TaskList
-            tasks={filteredTasks}
-            handleDeleteTask={handleDeleteTask}
-            handleEditTask={handleEditTask}
-            handleAddCollaborator={handleAddCollaborator} // Added this line
-          />
-          {selectedTask && (
-            <TaskModal
-              task={selectedTask}
-              onClose={handleCloseModal}
-              onCollaboratorAdded={handleCollaboratorAdded}
-            />
-          )}
-          {isTaskFormVisible && (
-            <div className='fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center'>
-              <div className='bg-white p-6 rounded-md shadow-md'>
-                <TaskForm
-                  newTask={newTask}
-                  setNewTask={setNewTask}
-                  handleInputChange={handleInputChange}
-                  handleAddOrUpdateTask={handleAddOrUpdateTask}
-                  setIsTaskFormVisible={setIsTaskFormVisible} // Pass setIsTaskFormVisible to TaskForm
-                />
-              </div>
+        )}
+  
+        {/* Task Form */}
+        {isTaskFormVisible && (
+          <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center'>
+            <div className='bg-white p-6 rounded-md shadow-md'>
+              <TaskForm
+                newTask={newTask}
+                setNewTask={setNewTask}
+                handleInputChange={handleInputChange}
+                handleAddOrUpdateTask={handleAddOrUpdateTask}
+                editingTask={editingTask}
+                setIsTaskFormVisible={setIsTaskFormVisible}
+              />
             </div>
-          )}
-          {error && (
-            <div className='mt-4 text-red-500'>
-              Error: {error}
-            </div>
-          )}
-        </div>
+          </div>
+        )}
+  
+        {/* Error */}
+        {error && (
+          <div className='mt-4 text-red-500'>
+            Error: {error}
+          </div>
+        )}
       </div>
     </div>
   );
+  
 };
 
 export default Dashboard;
