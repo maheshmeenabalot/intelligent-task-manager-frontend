@@ -11,7 +11,7 @@ const socket = io(process.env.REACT_APP_API_BASE_URL); // Initialize Socket.io c
 const Dashboard = () => {
   const user = JSON.parse(localStorage.getItem('user:detail')); // Removed setUser
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState({ task: '', description: '', dueDate: '', priority: 'low', status: 'pending', collaborators: [] });
+  const [newTask, setNewTask] = useState({ task: '', description: '', dueDate: '', priority: 'Low', status: 'Pending', collaborators: [] });
   const [editingTask, setEditingTask] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -73,7 +73,7 @@ const Dashboard = () => {
       if (!res.ok) {
         throw new Error(`Error adding/updating task: ${resData.message}`);
       } else {
-        setNewTask({ task: '', description: '', dueDate: '', priority: 'low', status: 'pending', collaborators: [] });
+        setNewTask({ task: '', description: '', dueDate: '', priority: 'Low', status: 'Pending', collaborators: [] });
         setEditingTask(null);
         setError(null); // Clear any previous errors
         if (method === 'POST') {
