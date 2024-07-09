@@ -22,12 +22,12 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/tasks/${user.id}`, {
+        const res = await fetch(${process.env.REACT_APP_API_BASE_URL}/api/tasks/${user.id}, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
         if (!res.ok) {
-          throw new Error(`Error fetching tasks: ${res.statusText}`);
+          throw new Error(Error fetching tasks: ${res.statusText});
         }
         const resData = await res.json();
         setTasks(resData);
@@ -42,13 +42,7 @@ const Dashboard = () => {
       setTasks((prevTasks) => prevTasks.map(task => task._id === updatedTask._id ? updatedTask : task));
     });
     socket.on('taskAdded', (newTask) => {
-      setTasks((prevTasks) => {
-        // Avoid adding the task if it already exists in the list
-        if (!prevTasks.find(task => task._id === newTask._id)) {
-          return [...prevTasks, newTask];
-        }
-        return prevTasks;
-      });
+      setTasks((prevTasks) => [...prevTasks, newTask]);
     });
 
     return () => {
@@ -66,7 +60,7 @@ const Dashboard = () => {
     try {
       const payload = { ...newTask, userId: user.id };
       const method = editingTask ? 'PUT' : 'POST';
-      const url = editingTask ? `${process.env.REACT_APP_API_BASE_URL}/api/tasks/${editingTask._id}` : `${process.env.REACT_APP_API_BASE_URL}/api/tasks`;
+      const url = editingTask ? ${process.env.REACT_APP_API_BASE_URL}/api/tasks/${editingTask._id} : ${process.env.REACT_APP_API_BASE_URL}/api/tasks;
 
       const res = await fetch(url, {
         method,
@@ -76,18 +70,17 @@ const Dashboard = () => {
 
       const resData = await res.json();
       if (!res.ok) {
-        throw new Error(`Error adding/updating task: ${resData.message}`);
+        throw new Error(Error adding/updating task: ${resData.message});
       } else {
         setNewTask({ task: '', description: '', dueDate: '', priority: 'Low', status: 'Pending', collaborators: [] });
         setEditingTask(null);
         setError(null); // Clear any previous errors
-        setIsTaskFormVisible(false); // Hide the task form modal after adding/updating
-        // Update tasks state directly
         if (method === 'POST') {
-          setTasks((prevTasks) => [...prevTasks, resData]);
+          socket.emit('taskAdded', resData);
         } else {
-          setTasks((prevTasks) => prevTasks.map(task => task._id === resData._id ? resData : task));
+          socket.emit('taskUpdated', resData);
         }
+        setIsTaskFormVisible(false); // Hide the task form modal after adding/updating
       }
     } catch (error) {
       console.error('Error adding/updating task:', error);
@@ -103,7 +96,7 @@ const Dashboard = () => {
     }
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/tasks/${taskId}`, {
+      const res = await fetch(${process.env.REACT_APP_API_BASE_URL}/api/tasks/${taskId}, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -112,7 +105,7 @@ const Dashboard = () => {
         setTasks((prevTasks) => prevTasks.filter(task => task._id !== taskId)); // Changed task.id to task._id
       } else {
         const resData = await res.json();
-        throw new Error(`Error deleting task: ${resData.message}`);
+        throw new Error(Error deleting task: ${resData.message});
       }
     } catch (error) {
       console.error('Error deleting task:', error);
@@ -144,7 +137,7 @@ const Dashboard = () => {
 
   const handleCollaboratorAdded = async (updatedTask) => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/tasks/${updatedTask._id}`, {
+      const res = await fetch(${process.env.REACT_APP_API_BASE_URL}/api/tasks/${updatedTask._id}, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedTask)
@@ -152,7 +145,7 @@ const Dashboard = () => {
 
       const resData = await res.json();
       if (!res.ok) {
-        throw new Error(`Error updating task: ${resData.message}`);
+        throw new Error(Error updating task: ${resData.message});
       } else {
         setTasks((prevTasks) => prevTasks.map(task => task._id === updatedTask._id ? updatedTask : task));
         socket.emit('taskUpdated', resData);
@@ -288,6 +281,5 @@ const Dashboard = () => {
       </div>
     </div>
   );
+  
 };
-
-export default Dashboard;
