@@ -6,24 +6,24 @@ import SearchAndFilters from './SearchAndFilters';
 import TaskModal from './TaskModal';
 import TaskForm from './TaskForm';
 
-const socket = io('http://localhost:8000'); // Initialize Socket.io connection
+const socket = io(process.env.REACT_APP_API_BASE_URL); // Initialize Socket.io connection
 
 const Dashboard = () => {
-  const [user] = useState(JSON.parse(localStorage.getItem('user:detail')));
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user:detail')));
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState({ task: '', description: '', dueDate: '', priority: 'low', status: 'pending', collaborators: [] });
   const [editingTask, setEditingTask] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
-  const [setError] = useState(null);
+  const [error, setError] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null); // For modal
   const [isTaskFormVisible, setIsTaskFormVisible] = useState(false); // For task form modal
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/api/tasks/${user.id}`, {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/tasks/${user.id}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -50,7 +50,7 @@ const Dashboard = () => {
       socket.off('taskUpdated');
       socket.off('taskAdded');
     };
-  }, [user.id]);
+  }, [user.id, setError]);
 
   const handleAddOrUpdateTask = async () => {
     if (newTask.task.trim() === '') {
@@ -61,7 +61,7 @@ const Dashboard = () => {
     try {
       const payload = { ...newTask, userId: user.id };
       const method = editingTask ? 'PUT' : 'POST';
-      const url = editingTask ? `http://localhost:8000/api/tasks/${editingTask._id}` : 'http://localhost:8000/api/tasks';
+      const url = editingTask ? `${process.env.REACT_APP_API_BASE_URL}/api/tasks/${editingTask._id}` : `${process.env.REACT_APP_API_BASE_URL}/api/tasks`;
 
       const res = await fetch(url, {
         method,
@@ -97,7 +97,7 @@ const Dashboard = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:8000/api/tasks/${taskId}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/tasks/${taskId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -138,7 +138,7 @@ const Dashboard = () => {
 
   const handleCollaboratorAdded = async (updatedTask) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/tasks/${updatedTask._id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/tasks/${updatedTask._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedTask)
@@ -227,16 +227,20 @@ const Dashboard = () => {
           )}
           {isTaskFormVisible && (
             <div className='fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center'>
-              <div className='bg-white p-8 rounded-lg shadow-lg w-1/2'>
-                <h2 className='text-xl font-bold mb-4'>{editingTask ? 'Edit Task' : 'Add Task'}</h2>
+              <div className='bg-white p-6 rounded-md shadow-md'>
                 <TaskForm
                   newTask={newTask}
+                  setNewTask={setNewTask}
                   handleInputChange={handleInputChange}
                   handleAddOrUpdateTask={handleAddOrUpdateTask}
-                  editingTask={editingTask}
-                  setIsTaskFormVisible={setIsTaskFormVisible} // Pass function to close modal
+                  setIsTaskFormVisible={setIsTaskFormVisible} // Pass setIsTaskFormVisible to TaskForm
                 />
               </div>
+            </div>
+          )}
+          {error && (
+            <div className='mt-4 text-red-500'>
+              Error: {error}
             </div>
           )}
         </div>
