@@ -9,7 +9,7 @@ import TaskForm from './TaskForm';
 const socket = io(process.env.REACT_APP_API_BASE_URL); // Initialize Socket.io connection
 
 const Dashboard = () => {
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user:detail')));
+  const user = JSON.parse(localStorage.getItem('user:detail')); // Removed setUser
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState({ task: '', description: '', dueDate: '', priority: 'low', status: 'pending', collaborators: [] });
   const [editingTask, setEditingTask] = useState(null);
