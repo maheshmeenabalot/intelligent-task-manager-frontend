@@ -22,7 +22,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/tasks?userId=${user.id}`, {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/tasks/${user.id}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -75,13 +75,12 @@ const Dashboard = () => {
         setNewTask({ task: '', description: '', dueDate: '', priority: 'Low', status: 'Pending', collaborators: [] });
         setEditingTask(null);
         setError(null); // Clear any previous errors
-        setIsTaskFormVisible(false); // Hide the task form modal after adding/updating
-        // Only emit the socket event without updating the state directly
         if (method === 'POST') {
           socket.emit('taskAdded', resData);
         } else {
           socket.emit('taskUpdated', resData);
         }
+        setIsTaskFormVisible(false); // Hide the task form modal after adding/updating
       }
     } catch (error) {
       console.error('Error adding/updating task:', error);
@@ -282,7 +281,7 @@ const Dashboard = () => {
       </div>
     </div>
   );
-
+  
 };
 
 export default Dashboard;
