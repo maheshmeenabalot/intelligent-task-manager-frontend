@@ -1,5 +1,5 @@
 # Intelligent Task Manager - Frontend
-
+-for backend code please cheak my another repo : https://github.com/maheshmeenabalot/intelligent-task-manager
 The **Intelligent Task Manager** is designed to streamline task management and collaboration through a user-friendly interface. The frontend of this project is built with React, providing a dynamic and responsive experience for users.
 
 ## Features
